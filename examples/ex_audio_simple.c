@@ -86,7 +86,7 @@ Restart:
             i = (event.keyboard.unichar - '0' + 9) % 10;
             if (sample_data[i]) {
                log_printf("Playing %d\n",i);
-               if (!al_play_sample(sample_data[i], 1.0, 0.5, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL)) {
+               if (!al_play_sample(sample_data[i], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL)) {
                   log_printf(
                      "al_play_sample_data failed, perhaps too many sounds\n");
                }
@@ -97,10 +97,19 @@ Restart:
           * For debugging race conditions on shutting down the audio.
           */
          if (event.keyboard.unichar == 'r') {
+            for (i = 0; i < argc && i < MAX_SAMPLE_DATA; i++) {
+               if (sample_data[i])
+                  al_destroy_sample(sample_data[i]);
+            }
             al_uninstall_audio();
             goto Restart;
          }
       }
+   }
+
+   for (i = 0; i < argc && i < MAX_SAMPLE_DATA; i++) {
+      if (sample_data[i])
+         al_destroy_sample(sample_data[i]);
    }
 
    /* Sample data and other objects will be automatically freed. */

@@ -162,7 +162,7 @@ void _al_osx_mouse_generate_event(NSEvent* evt, ALLEGRO_DISPLAY* dpy)
       // Y-coordinates in OS X start from the bottom.
       pos.y = NSHeight(frm) - pos.y;
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
-      scaling_factor = [[[evt window] contentView] backingScaleFactor];
+      scaling_factor = [[evt window] backingScaleFactor];
 #endif
    }
    else
@@ -342,7 +342,7 @@ static bool osx_set_mouse_xy(ALLEGRO_DISPLAY *dpy_, int x, int y)
 
       CGPoint point_pos = CGPointMake(x, y);
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
-      point_pos = [[window contentView] convertPointFromBacking: point_pos];
+      point_pos = NSPointToCGPoint([[window contentView] convertPointFromBacking: NSPointFromCGPoint(point_pos)]);
 #endif
       pos.x = content.origin.x + point_pos.x;
       pos.y = rect.size.height - content.origin.y - content.size.height + point_pos.y;

@@ -42,7 +42,7 @@ option(WANT_GLES3 "Compile with GLES3 support" OFF)
 option(ALLEGRO_SDL "Build using the SDL backend (experimental)" OFF)
 option(WANT_STATIC_RUNTIME "Whether or not to link the C and C++ runtimes statically (currently only implemented for MSVC)" OFF)
 
-set(ALLEGRO_VERSION 5.2.2)
+set(ALLEGRO_VERSION 5.2.3)
 string(REGEX MATCH "^[0-9]+[.][0-9]+" ALLEGRO_SOVERSION ${ALLEGRO_VERSION})
 string(REPLACE "." "" ALLEGRO_DLL_SHORTVER ${ALLEGRO_SOVERSION})
 
@@ -195,6 +195,16 @@ option(WANT_TESTS "Build test programs" on)
 
 include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
+
+if(CMAKE_COMPILER_IS_GNUCC)
+   get_gcc_system_include_dirs("c" "${CMAKE_C_COMPILER}" "${CMAKE_C_FLAGS}" SYSTEM_INCLUDE_DIRS)
+   set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES} ${SYSTEM_INCLUDE_DIRS})
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+   get_gcc_system_include_dirs("c++" "${CMAKE_CXX_COMPILER}" "${CMAKE_CXX_FLAGS}" SYSTEM_INCLUDE_DIRS)
+   set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES} ${SYSTEM_INCLUDE_DIRS})
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
     set(COMPILER_GCC 1)
@@ -624,6 +634,13 @@ if(SUPPORT_X11)
     else(CAN_XCURSOR)
         message(FATAL_ERROR "X11 support requires Xcursor library.")
     endif(CAN_XCURSOR)
+
+    check_library_exists(Xpm XpmCreatePixmapFromData "" CAN_XPM)
+    if(CAN_XPM)
+        set(ALLEGRO_XWINDOWS_WITH_XPM 1)
+        find_library(XPM_LIB "Xpm")
+        list(APPEND X11_LIBRARIES "${XPM_LIB}")
+    endif(CAN_XPM)
 
     check_include_file("X11/extensions/XInput2.h" CAN_XINPUT2)
     run_c_compile_test("
