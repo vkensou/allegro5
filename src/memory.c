@@ -17,7 +17,7 @@
 
 
 #include "allegro5/allegro.h"
-
+#include "jemalloc.h"
 
 /* globals */
 static ALLEGRO_MEMORY_INTERFACE *mem = NULL;
@@ -41,7 +41,7 @@ void *al_malloc_with_context(size_t n,
    if (mem)
       return mem->mi_malloc(n, line, file, func);
    else
-      return malloc(n);
+      return je_malloc(n);
 }
 
 
@@ -54,7 +54,7 @@ void al_free_with_context(void *ptr,
    if (mem)
       mem->mi_free(ptr, line, file, func);
    else
-      free(ptr);
+	   je_free(ptr);
 }
 
 
@@ -67,7 +67,7 @@ void *al_realloc_with_context(void *ptr, size_t n,
    if (mem)
       return mem->mi_realloc(ptr, n, line, file, func);
    else
-      return realloc(ptr, n);
+	   return je_realloc(ptr, n);
 }
 
 
@@ -80,7 +80,7 @@ void *al_calloc_with_context(size_t count, size_t n,
    if (mem)
       return mem->mi_calloc(count, n, line, file, func);
    else
-      return calloc(count, n);
+	   return je_calloc(count, n);
 }
 
 
